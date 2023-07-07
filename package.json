@@ -1,6 +1,6 @@
 {
   "name": "socket.io-ease",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Use socket.io as the routes of express.js or adonis.js",
   "main": "src/index.ts",
   "private": false,
