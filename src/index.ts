@@ -1,6 +1,8 @@
-import { SocketServer } from './SocketServer'
-export { SocketServer }
-export { SocketNode } from './libs'
+import { SocketServer } from "./SocketServer";
+
+export { SocketServer };
+export { SocketNode } from "./libs";
+
 export {
   SocketController,
   SocketNodeFunction,
@@ -9,4 +11,5 @@ export {
   SocketNext,
   SocketRequest,
   SocketConnection,
-} from './interfaces'
+  SocketStartOptions,
+} from "./interfaces";

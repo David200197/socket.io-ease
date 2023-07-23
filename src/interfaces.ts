@@ -7,6 +7,10 @@ export type InstanceServer = ConstructorParameters<typeof Server>[0]
 export type SocketReservedEvents = 'connect' | 'disconnect' | 'connect_error' | 'connect_failed'
 export type SocketIo = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 export type SocketNext = (err?: ExtendedError | undefined) => void
+export type SocketStartOptions = {
+  onComplete?: (metadata: Metadata) => void
+  onConnected?: (socket: SocketIo, metadata: Metadata) => void
+}
 export type SocketRequest = { body: any; event: string; [x: string]: any }
 export type SocketConnection = { socket: SocketIo; io: Server }
 export type SocketMiddleware = {

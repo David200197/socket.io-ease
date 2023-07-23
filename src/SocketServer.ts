@@ -1,26 +1,21 @@
 import { Server } from 'socket.io'
 import {
   InstanceServer,
-  Metadata,
   SocketGroup,
-  SocketIo,
   SocketController,
   SocketListeners,
   SocketReservatedEventOptions,
   SocketOptions,
   SocketReservedEvents,
+  SocketStartOptions,
 } from './interfaces'
 import { SocketControl } from './libs'
 
 export class SocketServer extends SocketControl {
-  private io: Server
+  public io: Server
 
-  constructor(instanceServer: InstanceServer, fn?: () => void) {
+  constructor() {
     super()
-    this.io = new Server(instanceServer, {
-      transports: ['websocket'],
-    })
-    fn && fn()
   }
 
   public addListener<Ev extends string>(
@@ -69,8 +64,8 @@ export class SocketServer extends SocketControl {
             prefix && group.prefix
               ? `${prefix}/${group.prefix}`
               : prefix && !group.prefix
-                ? prefix
-                : group.prefix,
+              ? prefix
+              : group.prefix,
           middlewares: [...middlewares, ...node.middlewares, ...group.middlewares],
         })
       }
@@ -78,7 +73,20 @@ export class SocketServer extends SocketControl {
     return Array.from(Setlisteners.values())
   }
 
-  public connection(listener?: (socket: SocketIo, metadata: Metadata) => void) {
+  public start(
+    instanceServer: InstanceServer,
+    { onComplete, onConnected: onListener }: SocketStartOptions = {}
+  ) {
+    this.io = new Server(instanceServer, {
+      transports: ['websocket'],
+    })
+    const listeners = this.groups.map((group) => this.convertGroupToListener(group)).flat()
+    const transformedListeners = [...this.listeners, ...listeners].map((listener) =>
+      listener.isReservated ? listener : { ...listener, ev: `/${listener.ev}` }
+    )
+    const events = transformedListeners.map(({ ev }) => ev)
+    onComplete && onComplete({ channels: events })
+
     this.io.on('connection', (socket) => {
       socket.use((event, next) => {
         event[1] = { body: { ...event[1] }, event: event[0] }
@@ -87,11 +95,6 @@ export class SocketServer extends SocketControl {
 
       for (const middleware of this.middlewares)
         socket.use((event, next) => middleware.handler(event[1], { socket, io: this.io }, next))
-
-      const listeners = this.groups.map((group) => this.convertGroupToListener(group)).flat()
-      const transformedListeners = [...this.listeners, ...listeners].map((listener) =>
-        listener.isReservated ? listener : { ...listener, ev: `/${listener.ev}` }
-      )
 
       for (const { controller, ev, middlewares } of transformedListeners) {
         if (!controller) return
@@ -105,8 +108,7 @@ export class SocketServer extends SocketControl {
         socket.on(ev, (event) => controller(event, { socket, io: this.io }))
       }
 
-      const events = transformedListeners.map(({ ev }) => ev)
-      listener && listener(socket, { channels: events })
+      onListener && onListener(socket, { channels: events })
     })
   }
 
