@@ -29,11 +29,8 @@ Once Socket.io-ease is installed, you can create a `SocketServer` instance by pr
 
 ```ts
 import { SocketServer } from "socket.io-ease";
-import server from "src/server"
 
-/*The server can be from any framework or library 
-(express, koa, fastity, adoniss.js) or simply standalone*/
-const socketServer = new SocketServer(server);
+const socketServer = new SocketServer();
 ```
 
 You can then add listeners to the server by providing event names and controller functions. Here's an example:
@@ -43,9 +40,11 @@ import { SocketServer } from "socket.io-ease";
 import server from "src/server";
 import controller from "src/controller";
 
-const socketServer = new SocketServer(server);
+const socketServer = new SocketServer();
 socketServer.addListener("example", controller); // listen in "/example" event
-socketServer.connection();
+/*The server can be from any framework or library 
+(express, koa, fastity, adoniss.js) or simply standalone*/
+socketServer.start(server);
 ```
 
 You can group listeners by using a callback that takes a `SocketNode` object as a parameter. Here's an example:
@@ -59,9 +58,9 @@ const exampleGroup = (node: SocketNode) => {
   node.addListener("example", controller)
 }
 
-const socketServer = new SocketServer(server);
+const socketServer = new SocketServer();
 socketServer.addGroup(exampleGroup)
-socketServer.connection();
+socketServer.start(server);
 ```
 
 You can also add a prefix to a group of listeners by providing it as an option. Here's an example:
@@ -75,9 +74,9 @@ const exampleGroup = (node: SocketNode) => {
   node.addListener("example", controller, { prefix: "foo" }) //listen in "/bee/foo/example" event
 }
 
-const socketServer = new SocketServer(server);
+const socketServer = new SocketServer();
 socketServer.addGroup(exampleGroup, { prefix: "bee" })
-socketServer.connection();
+socketServer.start(server);
 ```
 
 You can use middleware functions to handle incoming requests for a group of listeners as [express](https://expressjs.com/es/guide/using-middleware.html) or [adonis](https://docs.adonisjs.com/guides/middleware). Here's an example:
@@ -98,9 +97,9 @@ const exampleGroup = (node: SocketNode) => {
   node.addListener("example", controller, { middlewares: [Middleware] })
 }
 
-const socketServer = new SocketServer(server);
+const socketServer = new SocketServer();
 socketServer.addGroup(exampleGroup, { middlewares: [Middleware] })
-socketServer.connection();
+socketServer.start(server);
 ```
 
 Finally, here's an example of a controller function that can be used as a listener:
