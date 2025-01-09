@@ -1,11 +1,12 @@
 {
   "name": "socket.io-ease",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use socket.io as the routes of express.js or adonis.js",
   "main": "src/index.ts",
   "private": false,
   "scripts": {
-    "test": "ts-node bin/test.ts"
+    "test": "ts-node bin/test.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@japa/assert": "^1.4.1",
